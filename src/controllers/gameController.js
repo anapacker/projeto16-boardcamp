@@ -10,7 +10,7 @@ export async function getGames(req, res) {
 }
 
 export async function createGames(req, res) {
-    const { name, Image, stockTotal, pricePerDay } = req.body;
+    const { name, image, stockTotal, pricePerDay } = req.body;
 
     if (!name || name === "" || stockTotal <= 0 || pricePerDay <= 0) {
         res.status(400).send('Os campos "name", "stockTotal" e "pricePerDay devem ser preenchidos corretamente"')
@@ -22,9 +22,9 @@ export async function createGames(req, res) {
             res.status(409).send('Nome de jogo já existente.')
             return
         }
-        const values = [name, Image, stockTotal, pricePerDay]
+        const values = [name, image, stockTotal, pricePerDay]
         const insereGame = await db.query(`
-            INSERT INTO games (name, Image, stockTotal, pricePerDay)
+            INSERT INTO games (name, image, stockTotal, pricePerDay)
             VALUES ($1, $2, $3, $4);   
         `, values)
         res.send(insereGame.rows[0])

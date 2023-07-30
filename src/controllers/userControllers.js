@@ -29,8 +29,7 @@ export async function createCustomers(req, res) {
     try {
         const cpfExists = await db.query('SELECT * FROM customers WHERE cpf = $1;', [cpf])
         if (cpfExists.rows.length > 0) {
-            res.status(409).send('CPF já cadastrado.')
-            return
+            return res.status(409).send('CPF já cadastrado.')
         }
         const values = [name, phone, cpf, birthday]
         const insereCustomer = await db.query(`

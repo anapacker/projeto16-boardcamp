@@ -5,7 +5,7 @@ export function rentalsSchemaValidation(req, res, next) {
 
     if (validationRentals.error) {
         const errors = validationRentals.error.details.map((detail) => detail.message)
-        return res.status(422).send(errors)
+        return res.status(400).send(errors)
     }
 
     next()

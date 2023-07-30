@@ -6,7 +6,7 @@ export function userSchemaValidation(req, res, next) {
 
     if (validationUser.error) {
         const errors = validationUser.error.details.map((detail) => detail.message)
-        return res.status(422).send(errors)
+        return res.status(400).send(errors)
     }
 
     next()

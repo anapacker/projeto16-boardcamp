@@ -4,14 +4,33 @@ import { db } from '../database.js'
 export async function getRentals(req, res) {
     try {
         const rentals = await db.query(`
-        SELECT rentals.*, customers.id AS "customerId", customers.name AS "customerName", games.id AS "gameId", games.name AS "gameName"
-        FROM rentals
-        JOIN customers ON rentals."customerId" = customers.id
-        JOIN games ON rentals."gameId" = games.id;
+            SELECT rentals.*, customers.name AS "customerName", games.name AS "gameName"
+            FROM rentals
+            JOIN customers ON rentals."customerId" = customers.id
+            JOIN games ON rentals."gameId" = games.id;
         `)
 
         let rentalsRentDate = rentals.rows.map((rental) => {
-            return { ...rental, rentDate: rental.rentDate.toJSON().slice(0, 10), returnDate: rental.returnDate === null ? null : rental.returnDate.toJSON().slice(0, 10) }
+            const newRental = {
+                id: rental.id,
+                customerId: rental.customerId,
+                gameId: rental.gameId,
+                rentDate: rental.rentDate.toJSON().slice(0, 10),
+                daysRented: rental.daysRented,
+                returnDate: rental.returnDate === null ? null : rental.returnDate.toJSON().slice(0, 10),
+                originalPrice: rental.originalPrice,
+                delayFee: rental.delayFee,
+                customer: {
+                    id: rental.customerId,
+                    name: rental.customerName
+                },
+                game: {
+                    id: rental.gameId,
+                    name: rental.gameName
+                }
+            }
+
+            return newRental
         })
         res.send(rentalsRentDate)
     } catch (err) {

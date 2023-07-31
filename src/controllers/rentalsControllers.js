@@ -9,7 +9,11 @@ export async function getRentals(req, res) {
         JOIN customers ON rentals."customerId" = customers.id
         JOIN games ON rentals."gameId" = games.id;
         `)
-        res.send(rentals.rows)
+
+        let rentalsRentDate = rentals.rows.map((rental) => {
+            return { ...rental, rentDate: rental.rentDate.toJSON().slice(0, 10), returnDate: rental.returnDate === null ? null : rental.returnDate.toJSON().slice(0, 10) }
+        })
+        res.send(rentalsRentDate)
     } catch (err) {
         res.status(500).send(err.message)
     }
@@ -44,21 +48,6 @@ export async function createRentals(req, res) {
         `, [customerId, gameId, rentDate, daysRented, originalPrice])
 
         res.sendStatus(201)
-    } catch (err) {
-        res.status(500).send(err.message)
-    }
-}
-
-export async function getRentalsById(req, res) {
-    const { id } = req.query
-
-    try {
-        const rental = await db.query(`SELECT * FROM rentals WHERE id=$1`, [id])
-        if (rental.rows.length === 0) {
-            return res.sendStatus(404)
-        }
-        res.sendStatus(200)
-
     } catch (err) {
         res.status(500).send(err.message)
     }

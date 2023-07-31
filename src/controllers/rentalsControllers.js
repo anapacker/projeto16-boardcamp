@@ -27,18 +27,19 @@ export async function createRentals(req, res) {
         if (game.rows.length === 0) {
             return res.sendStatus(400)
         }
-        if (daysRented <= 0) {
+
+        const gamesIndisponiveis = await db.query(`SELECT * FROM rentals WHERE "gameId"=$1 AND "returnDate" IS NULL;`, [gameId])
+        const stockTotal = game.rows[0].stockTotal
+        if (gamesIndisponiveis.rows.length >= stockTotal) {
             return res.sendStatus(400)
         }
 
-        const rentedGames = await db.query(`SELECT * FROM rentals WHERE "gameId" = $1 AND "returnDate" IS NULL;`, [gameId])
-
-        const pricePerDay = game.rows[0].pricePerDay
         const rentDate = dayjs().format('YYYY-MM-DD')
+        const pricePerDay = game.rows[0].pricePerDay
         const originalPrice = pricePerDay * daysRented
 
         await db.query(`
-            INSERT INTO games ("customerId", "gameId","rentDate","daysRented","returnDate", "originalPrice", "delayFee") 
+            INSERT INTO rentals ("customerId", "gameId","rentDate","daysRented","returnDate", "originalPrice", "delayFee") 
             VALUES ($1, $2, $3, $4, NULL, $5, NULL);
         `, [customerId, gameId, rentDate, daysRented, originalPrice])
 

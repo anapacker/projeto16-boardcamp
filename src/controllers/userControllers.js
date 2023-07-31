@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { db } from '../database.js'
 
 export async function getCustomers(req, res) {
@@ -16,8 +15,8 @@ export async function getCustomersById(req, res) {
         const customer = await db.query(`
         SELECT * FROM customers WHERE id = $1;`, [id])
         if (customer.rows.length === 0) {
-            res.status(404).send('Cliente não encontrado')
-            return
+            return res.status(404).send('Cliente não encontrado')
+
         }
         res.send(customer.rows[0])
     } catch (err) {
@@ -33,6 +32,7 @@ export async function createCustomers(req, res) {
         if (cpfExists.rows.length > 0) {
             return res.status(409).send('CPF já cadastrado.')
         }
+        const birthday = dayjs().format('YYYY-MM-DD')
         const values = [name, phone, cpf, birthday]
         const insereCustomer = await db.query(`
             INSERT INTO customers (name, phone, cpf, birthday)

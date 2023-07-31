@@ -19,31 +19,30 @@ export async function createRentals(req, res) {
     const { customerId, gameId, daysRented } = req.body
 
     try {
-        const game = await db.query(`SELECT * FROM games WHERE id = $1;`, [gameId])
-        if (game.rows.length === 0) {
-            return res.status(400).send('Jogo não encontrado.')
-        }
-
-        const customer = await db.query(`SELECT * FROM customers WHERE id = $1`, [customerId])
-        if (customer.rows.length === 0) {
-            return res.status(400).send('Cliente não encontrado.')
-        }
+        const priceGame = await db.query(`SELECT games."pricePerDay" FROM games WHERE id = $1;`, [gameId])
         const rentDate = dayjs().format('YYYY-MM-DD')
-        const originalPrice = gameId[0].pricePerDay * daysRented
+        const originalPrice = priceGame * daysRented
 
         await db.query(`
-            INSERT INTO games ("customerId", "gameId","rentDate","daysRented","originalPrice") 
-            VALUES ($1, $2, $4, $4, $5);
+            INSERT INTO games ("customerId", "gameId","rentDate","daysRented","returnDate", "originalPrice", "delayFee") 
+            VALUES ($1, $2, $4,null, $5, null);
         `, [customerId, gameId, rentDate, daysRented, originalPrice])
 
+        res.sendStatus(201)
     } catch (err) {
         res.status(500).send(err.message)
     }
 }
 
 export async function getRentalsById(req, res) {
+    const { id } = req.query
+
     try {
-        res.send(rentals)
+        const rental = await db.query(`SELECT * FROM rentals WHERE id=$1`, [id])
+        if (rental.rows.length === 0) {
+            return res.sendStatus(404)
+        }
+        res.sendStatus(200)
 
     } catch (err) {
         res.status(500).send(err.message)

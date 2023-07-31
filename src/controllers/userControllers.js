@@ -25,7 +25,7 @@ export async function getCustomersById(req, res) {
         let birthdayCustomer = specificCustomer.rows.map((customer) => {
             return { ...customer, birthday: customer.birthday.toJSON().slice(0, 10) }
         })
-        res.send(birthdayCustomer)
+        res.send(birthdayCustomer[0])
     } catch (err) {
         res.status(500).send(err.message)
     }

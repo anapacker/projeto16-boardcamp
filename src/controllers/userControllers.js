@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { db } from '../database.js'
 
 export async function getCustomers(req, res) {
@@ -26,6 +27,7 @@ export async function getCustomersById(req, res) {
 
 export async function createCustomers(req, res) {
     const { name, phone, cpf, birthday } = req.body
+
     try {
         const cpfExists = await db.query('SELECT * FROM customers WHERE cpf = $1;', [cpf])
         if (cpfExists.rows.length > 0) {
